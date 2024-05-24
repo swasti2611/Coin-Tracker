@@ -1,39 +1,18 @@
-// function toFetchData() {
-//     const apiUrl = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false';
-
-//     // Fetch data from the API
-//     fetch(apiUrl)
-//         .then(response => {
-            
-//           return response.json();
-//         })
-//         .then(data => {
-//             // Process the fetched data
-//             console.log(data); // For example, you can log it to the console or render it in a table
-//             renderTable(data);
-//             setupSorting(data);
-//         })
-//         .catch(error => {
-//             console.error('There was a problem with the fetch operation:', error);
-//         });
-// }
-
-// fetching data using async await
 async function usingAsync() {
     try  {
         let res = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false");
         let resdata = await res.json();
         console.log(resdata);
 
-
         renderTable(resdata);
         setupSorting(resdata);
-        SortingbyPercentage(resdata)
+        SortingbyPercentage(resdata);
+        setupSearch(resdata);
     } catch (error) {
         console.log(error);
     }
 }
-usingAsync()
+usingAsync();
 
 function renderTable(data) {
     let tableBody = document.getElementById("tableBody");
@@ -52,28 +31,30 @@ function renderTable(data) {
         `;
         tableBody.appendChild(row);
     });
-    
 }
 
 function setupSorting(data) {
     let sortByMkt = document.getElementById("sortByMkt");
     sortByMkt.addEventListener('click', () => {
-        console.log("button clicked",data);
-       
-        data.sort((a, b) => a.market_cap - b.market_cap);
+        data.sort((a, b) => b.market_cap - a.market_cap);
         renderTable(data);
     });
 }
 
 function SortingbyPercentage(data) {
-    let sortByMkt = document.getElementById("sortByPercentage");
-    sortByMkt.addEventListener('click', () => {
-        console.log("button clicked",data);
-       
+    let sortByPercentage = document.getElementById("sortByPercentage");
+    sortByPercentage.addEventListener('click', () => {
         data.sort((a, b) => b.ath_change_percentage - a.ath_change_percentage);
         renderTable(data);
     });
 }
 
-
-
+function setupSearch(data) {
+    let searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === "Enter") {
+            let filteredData = data.filter(coin => coin.name.toLowerCase().includes(searchInput.value.toLowerCase()));
+            renderTable(filteredData);
+        }
+    });
+}
